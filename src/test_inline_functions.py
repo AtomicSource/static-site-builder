@@ -2,7 +2,7 @@ import unittest
 from inline_functions import *
 from textnode import TextNode, TextType
 
-class TestFunctions(unittest.TestCase):
+class TestInlineFunctions(unittest.TestCase):
     def test_split_md_bold(self):
         old_nodes = [
             TextNode("This is text with **a few bold** words.", TextType.TEXT)
