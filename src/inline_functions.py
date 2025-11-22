@@ -69,6 +69,9 @@ def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
             remaining_text = remaining_text.lstrip(')')
             if remaining_text == "":
                 break
+        # print(f"after loop finish {remaining_text=}")
+        if remaining_text != "":
+            new_nodes.append(TextNode(remaining_text, TextType.TEXT))
     
     return new_nodes
 
@@ -97,5 +100,23 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
             remaining_text = remaining_text.lstrip(')')
             if remaining_text == "":
                 break
+        if remaining_text != "":
+            new_nodes.append(TextNode(remaining_text, TextType.TEXT))
     
     return new_nodes
+
+def text_to_textnodes(text: str) -> list[TextNode]:
+    # convert to a big TextNode
+    text_nodes = [TextNode(text, TextType.TEXT)]
+    # assume NO nested textNodes (like **__italic__ within bold**)
+    # split out **BOLD**
+    text_nodes = split_nodes_delimiter(text_nodes, "**", TextType.BOLD)
+    # split out _ITALIC_
+    text_nodes = split_nodes_delimiter(text_nodes, "_", TextType.ITALIC)
+    # split out `CODE`
+    text_nodes = split_nodes_delimiter(text_nodes, "`", TextType.CODE)
+    # split out IMAGES
+    text_nodes = split_nodes_image(text_nodes)
+    # split out LINKS
+    text_nodes = split_nodes_link(text_nodes)
+    return text_nodes
