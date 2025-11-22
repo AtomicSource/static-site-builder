@@ -1,6 +1,7 @@
 import unittest
 
-from textnode import TextNode, TextType, split_nodes_delimiter
+from textnode import TextNode, TextType
+from functions import split_nodes_delimiter 
 
 
 class TestTextNode(unittest.TestCase):
@@ -40,7 +41,7 @@ class TestTextNode(unittest.TestCase):
         node1 = TextNode("This is a text node", TextType.IMAGE, "image/link")
         self.assertEqual(
             repr(node1),
-            "TextNode(This is a text node, image, image/link)"
+            "TextNode(This is a text node, IMAGE, image/link)"
         )
 
     def test_to_html_node(self):
@@ -84,103 +85,6 @@ class TestTextNode(unittest.TestCase):
             {"src": "http://localhost/a.png", "alt": "This is an image"}
         )
     
-    def test_split_md_bold(self):
-        old_nodes = [
-            TextNode("This is text with **a few bold** words.", TextType.TEXT)
-        ]
-        new_nodes = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
-        self.assertEqual(
-            [TextNode("This is text with ", TextType.TEXT),
-             TextNode("a few bold", TextType.BOLD),
-             TextNode(" words.", TextType.TEXT)
-            ],
-            new_nodes
-        )
-
-    def test_split_md_bold_start_end(self):
-        old_nodes = [
-            TextNode("**Bold text from start to end**", TextType.TEXT)
-        ]
-        new_nodes = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
-        self.assertEqual(
-            [
-                TextNode("", TextType.TEXT),
-                TextNode("Bold text from start to end", TextType.BOLD),
-            ],
-            new_nodes
-        )
-
-    def test_split_md_code_at_end(self):
-        old_nodes = [
-            TextNode("Code: `uv run main`", TextType.TEXT)
-        ]
-        new_nodes = split_nodes_delimiter(old_nodes, "`", TextType.CODE)
-        self.assertEqual(
-            [
-                TextNode("Code: ", TextType.TEXT),
-                TextNode("uv run main", TextType.CODE),
-            ],
-            new_nodes
-        )
-
-    def test_split_md_italic_twice(self):
-        old_nodes = [
-            TextNode("Text with _two_ sets of _italic words._", TextType.TEXT)
-        ]
-        new_nodes = split_nodes_delimiter(old_nodes, "_", TextType.ITALIC)
-        self.assertEqual(
-            [TextNode("Text with ", TextType.TEXT),
-             TextNode("two", TextType.ITALIC),
-             TextNode(" sets of ", TextType.TEXT),
-             TextNode("italic words.", TextType.ITALIC),
-            ],
-            new_nodes
-        )
-
-    def test_split_md_many_nodes(self):
-        old_nodes = [
-            TextNode("_Text in italic._", TextType.TEXT),
-            TextNode("This is text with **a few bold** words.", TextType.TEXT),
-            TextNode("Text with _two_ sets of _italic words._", TextType.TEXT),
-        ]
-        new_nodes = split_nodes_delimiter(old_nodes, "_", TextType.ITALIC)
-        self.assertEqual(
-            [
-                TextNode("", TextType.TEXT),
-                TextNode("Text in italic.", TextType.ITALIC),
-                TextNode("This is text with **a few bold** words.", TextType.TEXT),
-                TextNode("Text with ", TextType.TEXT),
-                TextNode("two", TextType.ITALIC),
-                TextNode(" sets of ", TextType.TEXT),
-                TextNode("italic words.", TextType.ITALIC),
-            ],
-            new_nodes
-        )
-        newer_nodes = split_nodes_delimiter(new_nodes, "**", TextType.BOLD)
-        self.assertEqual(
-            [
-                TextNode("", TextType.TEXT),
-                TextNode("Text in italic.", TextType.ITALIC),
-                TextNode("This is text with ", TextType.TEXT),
-                TextNode("a few bold", TextType.BOLD),
-                TextNode(" words.", TextType.TEXT),
-                TextNode("Text with ", TextType.TEXT),
-                TextNode("two", TextType.ITALIC),
-                TextNode(" sets of ", TextType.TEXT),
-                TextNode("italic words.", TextType.ITALIC),
-            ],
-            newer_nodes
-        )
-
-    def test_split_md_invalid(self):
-        old_nodes = [
-            TextNode("Invalid _markdown", TextType.TEXT)
-        ]
-        self.assertRaises(
-            SyntaxError,
-            split_nodes_delimiter,
-            old_nodes, "_", TextType.ITALIC
-        )
 
 if __name__ == "__main__":
     unittest.main()

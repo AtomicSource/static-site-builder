@@ -32,7 +32,7 @@ class TextNode():
         )
 
     def __repr__(self):
-        return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
+        return f"TextNode({self.text}, {self.text_type.name}, {self.url})"
     
     def to_html_node(self) -> LeafNode:
         match self.text_type:
@@ -52,33 +52,3 @@ class TextNode():
             case _:
                 raise ValueError("Text Node with invalid text type")
 
-def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str,
-                          text_type: TextType) -> list[TextNode]:
-    new_nodes = []
-    for node in old_nodes:
-        if node.text_type != TextType.TEXT:
-            new_nodes.append(node)
-            continue
-        # search for delimiter type given in text
-        if delimiter not in node.text:
-            new_nodes.append(node)
-            continue
-        text_to_split = node.text
-        while True:
-            start, rest = text_to_split.split(delimiter, maxsplit=1)
-            new_nodes.append(TextNode(start, TextType.TEXT))
-            if delimiter not in rest:
-                raise SyntaxError(
-                    f"invalid Markdown syntax: opening delimiter {delimiter} found, "
-                    + "but no matching closing delimiter"
-                )
-            middle, end = rest.split(delimiter, maxsplit=1)
-            new_nodes.append(TextNode(middle,text_type))
-            if end == "":
-                break
-            if delimiter not in end:
-                new_nodes.append(TextNode(end,TextType.TEXT))
-                break
-            text_to_split = end
-
-    return new_nodes
